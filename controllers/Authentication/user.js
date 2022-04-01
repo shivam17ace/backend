@@ -27,6 +27,9 @@ exports.signup = (req, res, next) => {
   if (password != confirm_password) {
     errors.push("password mismatch");
   }
+  if (errors.length > 0) {
+    return res.status(422).json({ errors: errors });
+  }
   User.findOne({ email: email })
     .then((user) => {
       if (user) {

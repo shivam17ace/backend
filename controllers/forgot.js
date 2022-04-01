@@ -1,9 +1,11 @@
 const User = require("../models/index");
 require("dotenv").config();
-const sgMail = require("@sendgrid/mail");
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const emailRegxp =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+const Token = require("../models/token");
+const crypto = require("crypto");
+const sendEmail = require("../util/mail");
+const token = require("../models/token");
 exports.forgot = (req, res, next) => {
   let { email } = req.body;
   let errors = [];
@@ -19,103 +21,58 @@ exports.forgot = (req, res, next) => {
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
-        return res.status(401).json({
-          message:
-            "The email address " +
-            req.body.email +
-            " is not associated with any account. Double-check your email address and try again.",
-        });
+        res
+          .status(500)
+          .send({ message: "User With This Mail Adress Is Not Found" });
       } else {
-        user.generatePasswordReset();
-        user
-          .save()
-          .then((user) => {
-            let token = user.resetPasswordToken;
-            let link =
+        Token.findOne({ userId: user._id })
+          .then((data) => {
+            if (!data) {
+              const token = new Token({
+                userId: user._id,
+                email: req.body.email,
+                token: crypto.randomBytes(32).toString("hex"),
+              });
+              token.save();
+            }
+            const link = `${process.env.DATABASE}/resetPassword/${user._id}/${data.token}`;
+            const link1 =
               "http://" +
               req.headers.host +
-              `/resetPassword?resetPasswordtoken=${token}`;
-            console.log(link);
-            const mailOptions = {
-              to: user.email,
-              from: process.env.FROM_EMAIL,
-              subject: "Password change request",
-              text: `Hi ${user.email} \n 
-              Please click on the following link ${link} to reset your password. \n\n 
-              If you did not request this, please ignore this email and your password will remain unchanged.\n`,
-            };
-            sgMail.send(mailOptions, (result, error) => {
-              if (result) {
-                res.status(200).json({
-                  message: "A reset email has been sent to " + user.email + ".",
-                });
-              } else {
-                return res.status(500).json({ message: error.message });
-              }
-            });
+              `/resetPassword/${user._id}/${data.token}`;
+            console.log(link1);
+            sendEmail(user.email, "Password reset", link);
+            res.send("password reset link sent to your email account");
+          })
+          .catch((err) => {
+            res.send("Error Occured");
+          });
+      }
+    })
+    .catch((err) => {
+      err;
+    });
+};
+exports.resetPassword = (req, res, next) => {
+  User.findById(req.params.userId)
+    .then((user) => {
+      if (!user) {
+        res.status(400).send("Invalid Link OR Link Expired");
+      } else {
+        Token.findOne({ userId: user._id, token: req.params.token })
+          .then((user) => {
+            console.log(req.params.token);
+            console.log(user._id);
+            user.password = req.body.password;
+            user.save();
+            // token.delete();
+            console.log(user.password);
+            res.status(201).send(user);
           })
           .catch((err) => res.status(500).json({ message: err.message }));
       }
     })
-    .catch((err) => res.status(500).json({ message: err.message }));
-};
-// exports.reset = (req, res) => {
-//   User.findOne({
-//     resetPasswordToken: resetPasswordToken,
-//     resetPasswordExpires: { $gt: new Date() },
-//   })
-//     .then((user) => {
-//       console.log(resetPasswordToken);
-//       if (!user)
-//         return res
-//           .status(401)
-//           .json({ message: "Password reset token is invalid or has expired." });
-//       res.render("reset", { user });
-//     })
-//     .catch((err) => res.status(500).json({ message: err.message }));
-// };
-exports.resetPassword = (req, res) => {
-  let { password } = req.body;
-  let { resetPasswordToken } = req.params;
-  User.findOne({
-    resetPasswordToken: resetPasswordToken,
-    resetPasswordExpires: { $gt: new Date() },
-  }).then((user) => {
-    console.log(req.params.token);
-    console.log(token);
-    if (!user) {
-      return res.status(401).json({
-        message: "Password reset token is invalid or has been expired.",
-      });
-    } else {
-      //Set  new password
-      user.password = password;
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpires = undefined;
-
-      // Save
-      user.save((err) => {
-        if (err) return res.status(500).json({ message: err.message });
-
-        // send email
-        const mailOptions = {
-          to: user.email,
-          from: process.env.FROM_EMAIL,
-          subject: "Your password has been changed",
-          text: `Hi ${user.username} \n 
-                    This is a confirmation that the password for your account ${user.email} has just been changed.\n`,
-        };
-
-        sgMail.send(mailOptions, (result, error) => {
-          if (result) {
-            res
-              .status(200)
-              .json({ message: "Your password has been updated." });
-          } else {
-            return res.status(500).json({ message: error.message });
-          }
-        });
-      });
-    }
-  });
+    .catch((error) => {
+      error;
+    });
 };

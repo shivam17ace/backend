@@ -144,15 +144,7 @@ exports.findall = (req, res, next) => {
     query.skip = skip;
     query.limit = limit;
   }
-  // if (sortBy) {
-  //   query.sortBy = sortBy;
-  //   // query.OrderBy = OrderBy;
-  // }
-  // if (OrderBy) {
-  //   query.OrderBy = OrderBy;
-  //   // query.OrderBy = OrderBy;
-  // }
-  if(sortBy && OrderBy){
+  if (sortBy && OrderBy) {
     query.sortBy = sortBy;
     query.OrderBy = OrderBy;
   }
@@ -160,7 +152,6 @@ exports.findall = (req, res, next) => {
     .limit(query.limit)
     .skip(query.skip)
     .sort([[sortBy, query.OrderBy]])
-    // User.find(filter)
     .then((users) => {
       res.status(200).send({ message: "Users Fetched", data: users });
     })

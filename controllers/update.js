@@ -114,11 +114,10 @@ exports.update = (req, res, next) => {
 /*  GET ALL USER DATA */
 exports.findall = (req, res, next) => {
   /* Pagenation ,filtering, Sorting  */
-  let { name, email, role, status } = req.query;
+  let { name, email, role, status, sortBy } = req.query;
   let page = parseInt(req.query.page);
   let limit = parseInt(req.query.limit);
   let skip = parseInt(req.query.skip);
-  let sortBy = req.query;
   let OrderBy = parseInt(req.query.OrderBy);
   let query = {};
   let filter = {};
@@ -145,18 +144,22 @@ exports.findall = (req, res, next) => {
     query.skip = skip;
     query.limit = limit;
   }
-  if (sortBy) {
+  // if (sortBy) {
+  //   query.sortBy = sortBy;
+  //   // query.OrderBy = OrderBy;
+  // }
+  // if (OrderBy) {
+  //   query.OrderBy = OrderBy;
+  //   // query.OrderBy = OrderBy;
+  // }
+  if(sortBy && OrderBy){
     query.sortBy = sortBy;
-    // query.OrderBy = OrderBy;
-  }
-  if (OrderBy) {
     query.OrderBy = OrderBy;
-    // query.OrderBy = OrderBy;
   }
   User.find(filter)
     .limit(query.limit)
     .skip(query.skip)
-    .sort([[sortBy,OrderBy]])
+    .sort([[sortBy, query.OrderBy]])
     // User.find(filter)
     .then((users) => {
       res.status(200).send({ message: "Users Fetched", data: users });

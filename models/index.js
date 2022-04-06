@@ -4,28 +4,23 @@ let userSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
+      
       maxlength: 50,
       trim: true,
     },
     email: {
       type: String,
-      required: true,
       unique: 1,
       trim: true,
       lowercase: true,
     },
     password: {
       type: String,
-      required: true,
+      
       minlength: 8,
     },
     role: {
       type: String,
-    },
-    phone: {
-      type: Number,
-      trim: true,
     },
     status: {
       type: Boolean,
@@ -33,12 +28,17 @@ let userSchema = new Schema(
     },
     resetPasswordToken: {
       type: String,
-      required: false,
     },
     resetPasswordExpires: {
       type: Date,
-      required: false,
     },
+    phone:{
+      type:String,
+      trim:true,
+      unique:true,
+    
+    },
+    source: { type: String, required: [true, "source not specified"] },
   },
   {
     timestamps: true,

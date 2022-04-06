@@ -23,15 +23,15 @@ exports.forgot = (req, res, next) => {
         .status(500)
         .send({ message: "User With This Mail Adress Is Not Found" });
     } else {
-      resetPasswordToken = crypto.randomBytes(20).toString("hex");
-      resetPasswordExpires = Date.now() + 300000;
+      user.resetPasswordToken = crypto.randomBytes(20).toString("hex");
+      user.resetPasswordExpires = Date.now() + 300000;
       user.save();
     }
-    const link = `${process.env.DATABASE}/resetPassword/${user._id}/${resetPasswordToken}`;
+    const link = `${process.env.DATABASE}/resetPassword/${user._id}/${user.resetPasswordToken}`;
     const link1 =
       "http://" +
       req.headers.host +
-      `/resetPassword/${user._id}/${resetPasswordToken}`;
+      `/resetPassword/${user._id}/${user.resetPasswordToken}`;
     console.log(link1);
     sendEmail(user.email, "Password reset", link);
     res.send("password reset link sent to your email account");
@@ -43,20 +43,21 @@ exports.resetPassword = (req, res, next) => {
     if (!user) {
       res.status(400).send("Invalid Link OR Link Expired");
     } else {
-      User.findOne({ resetPasswordToken: req.params.resetPasswordToken }).then(
-        (user) => {
-          user.password = req.body.password;
-          bcrypt.genSalt(10, function (err, salt) {
-            bcrypt.hash(user.password, salt, function (err, hash) {
-              if (err) throw err;
-              user.password = hash;
-              user.save();
-              console.log(user.password);
-              res.status(201).send(user);
-            });
+      User.findOne({
+        resetPasswordToken: req.params.resetPasswordToken,
+        resetPasswordExpires: { $gt: Date.now() },
+      }).then((user) => {
+        user.password = req.body.password;
+        bcrypt.genSalt(10, function (err, salt) {
+          bcrypt.hash(user.password, salt, function (err, hash) {
+            if (err) throw err;
+            user.password = hash;
+            user.save();
+            console.log(user.password);
+            res.status(201).send(user);
           });
-        }
-      );
+        });
+      });
     }
   });
 };

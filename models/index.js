@@ -4,7 +4,7 @@ let userSchema = new Schema(
   {
     name: {
       type: String,
-      
+
       maxlength: 50,
       trim: true,
     },
@@ -16,7 +16,7 @@ let userSchema = new Schema(
     },
     password: {
       type: String,
-      
+
       minlength: 8,
     },
     role: {
@@ -32,20 +32,20 @@ let userSchema = new Schema(
     resetPasswordExpires: {
       type: Date,
     },
-    phone:{
-      type:String,
-      trim:true,
+    phone: {
+      type: String,
+      trim: true,
       // unique:true,
     },
-    image:{
-      type:String,
+    image: {
+      type: String,
     },
     otp: {
       type: String,
       // required: true,
     },
     createdAt: { type: Date, default: Date.now(), index: { expiresIn: 300 } },
-    source: { type: String, required: [true, "source not specified"] },
+    source: { type: String,  },
   },
   {
     timestamps: true,

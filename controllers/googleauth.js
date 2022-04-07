@@ -13,10 +13,8 @@ passport.use(
       console.log(profile);
       //   return done(profile, null);
       const newuser = new User({
-        googleId: profile.id,
-        displayName: profile.displayName,
-        firstName: profile.name.givenName,
-        lastName: profile.name.familyName,
+        id: profile.id,
+        name: profile.displayName,
         image: profile.photos[0].value,
         email: profile.emails[0].value,
         source: "google",

@@ -4,7 +4,7 @@ const emailRegxp =
 
 /* Create User (ADMIN)  */
 exports.create = (req, res, next) => {
-  let { name, email, roll, phone, password, confirm_password } = req.body;
+  let { name, email, role, phone, password, confirm_password  } = req.body;
   let errors = [];
   if (!name) {
     errors.push("name required");
@@ -40,7 +40,7 @@ exports.create = (req, res, next) => {
         email: email,
         password: password,
         confirm_password: confirm_password,
-        roll: roll,
+        role: role,
         phone: phone,
       });
       user
@@ -55,6 +55,7 @@ exports.create = (req, res, next) => {
           res.status(500).json({
             errors: [{ error: err }],
           });
+          console.log(err);
         });
     }
   });
@@ -86,7 +87,7 @@ exports.find = (req, res) => {
 exports.update = (req, res, next) => {
   let { email } = req.body;
   let errors = [];
-  if(email){
+  if (email) {
     if (!emailRegxp.test(email)) {
       errors.push("invalid email");
     }

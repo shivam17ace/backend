@@ -34,6 +34,10 @@ router.get(
     res.redirect("/");
   }
 );
+router.post("/authlogout", function (req, res) {
+  req.logout();
+  res.redirect("/");
+});
 router.get(
   "/auth/facebook",
   passport.authenticate("facebook", { scope: ["profile", "email"] })

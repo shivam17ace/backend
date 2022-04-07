@@ -12,32 +12,37 @@ passport.use(
     function (request, acessToken, refreshToken, profile, done) {
       console.log(profile);
       //   return done(profile, null);
-      const user = new User({
-        id: profile.id,
-        email: profile.emails[0].value,
+      const newuser = new User({
+        googleId: profile.id,
+        displayName: profile.displayName,
         firstName: profile.name.givenName,
         lastName: profile.name.familyName,
-        profilePhoto: profile.photos[0].value,
+        image: profile.photos[0].value,
+        email: profile.emails[0].value,
         source: "google",
       });
-      User.findOne({email:user.email})
-      .then((data)=>{
-          user.save();
-      })
-      .catch((error)=>{res.status(500).json({err:error})});
+      User.findOne({ email: newuser.email })
+        .then((data) => {
+          if (data) {
+            done(null, data);
+          } else {
+            data = User.create(newuser);
+            done(null, data);
+          }
+        })
+        .catch((error) => {
+          res.status(500).json({ err: error });
+        });
     }
   )
 );
-passport.serializeUser((user, cb) => {
-  cb(user, null);
+passport.serializeUser(function (newuser, done) {
+  console.log(newuser);
+  done(null, newuser.id);
 });
 
-passport.deserializeUser((obj, cb) => {
-  cb(obj, null);
+passport.deserializeUser(function (id, done) {
+  User.findById(id, function (err, user) {
+    done(err, user);
+  });
 });
-(module.exports.passport = passport.authenticate("google", {
-  scope: ["profile", "email"],
-})),
-  (req, res, next) => {
-    next();
-  };

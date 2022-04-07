@@ -16,7 +16,7 @@ module.exports.otpsignup = (req, res, next) => {
   if (errors.length > 0) {
     return res.status(422).json({ errors: errors });
   }
-  Otp.findOne({ phone: phone })
+  User.findOne({ phone: phone })
     .then((user) => {
       if (user) {
         res.status(400).send("User Already Registered..");
@@ -29,16 +29,17 @@ module.exports.otpsignup = (req, res, next) => {
         });
         console.log(OTP);
         /*  to send otp as a sms use local sms gateway  */
-        const userotp = new Otp({
+        const user = new User({
           phone: phone,
           otp: OTP,
+          source: "OTP",
         });
 
         bcrypt.genSalt(10, function (err, salt) {
-          bcrypt.hash(userotp.otp, salt, function (err, hash) {
+          bcrypt.hash(user.otp, salt, function (err, hash) {
             if (err) throw err;
-            userotp.otp = hash;
-            userotp.save();
+            user.otp = hash;
+            user.save();
             res.status(200).send("OTP Send Sucessfully");
           });
         });
@@ -60,7 +61,7 @@ module.exports.otplogin = (req, res, next) => {
   if (errors.length > 0) {
     return res.status(422).json({ errors: errors });
   }
-  Otp.find({ phone: phone })
+  User.find({ phone: phone })
     .then((otp) => {
       if (otp.length === 0) {
         return res.status(400).send("OTP Expired");
@@ -71,8 +72,8 @@ module.exports.otplogin = (req, res, next) => {
         .then((match) => {
           if (match) {
             if (rightOtpFind.phone === req.body.phone) {
-              const userotp = new Otp(_.pick(req.body, ["phone"]));
-              let token = createJWT(userotp.phone);
+              const user = new User(_.pick(req.body, ["phone"]));
+              let token = createJWT(user.phone);
               jwt.verify(token, process.env.TOKEN, (err, suces) => {
                 if (err) {
                   res.status(404).json({ error: err });
@@ -81,12 +82,12 @@ module.exports.otplogin = (req, res, next) => {
                   return res.status(200).json({
                     success: true,
                     token: token,
-                    message: userotp,
+                    message: user,
                   });
                 }
               });
-              userotp.save();
-              Otp.deleteMany({ phone: rightOtpFind.phone });
+              user.save();
+              User.deleteMany({ phone: rightOtpFind.phone });
               return res.status(200).send({
                 message: "USer Registration Sucessfull",
                 token: token,

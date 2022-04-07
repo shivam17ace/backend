@@ -35,9 +35,16 @@ let userSchema = new Schema(
     phone:{
       type:String,
       trim:true,
-      unique:true,
-    
+      // unique:true,
     },
+    image:{
+      type:String,
+    },
+    otp: {
+      type: String,
+      // required: true,
+    },
+    createdAt: { type: Date, default: Date.now(), index: { expiresIn: 300 } },
     source: { type: String, required: [true, "source not specified"] },
   },
   {

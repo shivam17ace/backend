@@ -86,8 +86,10 @@ exports.find = (req, res) => {
 exports.update = (req, res, next) => {
   let { email } = req.body;
   let errors = [];
-  if (!emailRegxp.test(email)) {
-    errors.push("invalid email");
+  if(email){
+    if (!emailRegxp.test(email)) {
+      errors.push("invalid email");
+    }
   }
   if (errors.length > 0) {
     return res.status(422).json({ errors: errors });

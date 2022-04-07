@@ -8,6 +8,7 @@ require("dotenv").config();
 const Route = require("./routes/index");
 const passport = require("passport");
 require("./controllers/googleauth");
+require("./controllers/facebokaut");
 
 
 /* middleware */
@@ -19,7 +20,7 @@ app.use("/uploads", express.static("./uploads"));
 app.use(
   session({
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     secret: "bla bla bla",
   })
 );

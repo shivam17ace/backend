@@ -13,6 +13,8 @@ let userSchema = new Schema(
       unique: 1,
       trim: true,
       lowercase: true,
+      index:true,
+      sparse:true,
     },
     password: {
       type: String,
@@ -45,7 +47,7 @@ let userSchema = new Schema(
       // required: true,
     },
     createdAt: { type: Date, default: Date.now(), index: { expiresIn: 300 } },
-    source: { type: String,  },
+    source: { type: String },
   },
   {
     timestamps: true,

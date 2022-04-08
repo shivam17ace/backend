@@ -6,7 +6,7 @@ const Otp = require("../models/otp");
 const { createJWT } = require("../util/otptoken");
 const _ = require("lodash");
 
-/*  SIGNUP USING OTP  */
+/*  SIGNUP USING OTP     One issue */
 module.exports.otpsignup = (req, res, next) => {
   let { phone } = req.body;
   let errors = {};
@@ -28,7 +28,9 @@ module.exports.otpsignup = (req, res, next) => {
           specialChars: false,
         });
         console.log(OTP);
-        /*  to send otp as a sms use local sms gateway  */
+        /*  to send otp as a sms use local sms gateway {
+
+        } */
         const user = new User({
           phone: phone,
           otp: OTP,
@@ -40,14 +42,15 @@ module.exports.otpsignup = (req, res, next) => {
             if (err) throw err;
             user.otp = hash;
             user.save();
-            res.status(200).send("OTP Send Sucessfully");
+            res.status(200).json({
+              message: "User Registered SucessFully   :" + OTP,
+            });
           });
         });
       }
     })
-    .catch((error) => {
-      res.status(500).json({ errors: error });
-      console.log(error);
+    .catch((err) => {
+      res.status(500).json({ error: err });
     });
 };
 

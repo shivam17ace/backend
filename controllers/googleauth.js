@@ -11,7 +11,6 @@ passport.use(
     },
     function (request, acessToken, refreshToken, profile, done) {
       console.log(profile);
-      //   return done(profile, null);
       const newuser = new User({
         id: profile.id,
         name: profile.displayName,

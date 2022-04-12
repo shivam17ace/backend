@@ -36,9 +36,13 @@ module.exports.otpsignup = (req, res, next) => {
           otp: OTP,
           source: "OTP",
         });
-        const accessToken = jwt.sign({ userId: user._id , user }, process.env.TOKEN, {
-          expiresIn: "1d",
-        });
+        const accessToken = jwt.sign(
+          { userId: user._id, user },
+          process.env.TOKEN,
+          {
+            expiresIn: "1d",
+          }
+        );
         user.accessToken = accessToken;
 
         bcrypt.genSalt(10, function (err, salt) {
@@ -81,25 +85,26 @@ module.exports.otplogin = (req, res, next) => {
           if (match) {
             if (rightOtpFind.phone === req.body.phone) {
               const user = new User(_.pick(req.body, ["phone"]));
-              let token = createJWT(user.phone);
-              jwt.verify(token, process.env.TOKEN, (err, suces) => {
-                if (err) {
-                  res.status(404).json({ error: err });
+              const accessToken = jwt.sign(
+                { userId: user._id, user },
+                process.env.TOKEN,
+                {
+                  expiresIn: "1d",
                 }
-                if (suces) {
-                  return res.status(200).json({
-                    success: true,
-                    token: token,
-                    message: user,
+              );
+              User.findByIdAndUpdate(user._id, { accessToken })
+                .then((user) => {
+                  res.status(200).json({
+                    data: user,
+                    accessToken,
                   });
-                }
-              });
+                })
               user.save();
               User.deleteMany({ phone: rightOtpFind.phone });
               return res.status(200).send({
                 message: "USer Registration Sucessfull",
-                token: token,
-                data: userotp,
+                accessToken: accessToken,
+                data: user,
               });
             }
           } else {

@@ -1,9 +1,10 @@
-const User = require("../../models/index");
+const User = require("../../models/user");
 const bcrypt = require("bcrypt");
 const emailRegxp =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 const jwt = require("jsonwebtoken");
 const { createJWT } = require("../../util/token");
+
 exports.signup = (req, res, next) => {
   let { name, email, password, confirm_password } = req.body;
   let errors = [];
@@ -42,6 +43,12 @@ exports.signup = (req, res, next) => {
           email: email,
           password: password,
         });
+        const accessToken = jwt.sign({ userId: users._id, users }, process.env.TOKEN, {
+          expiresIn: "1d",
+        });
+        users.accessToken = accessToken;
+        // save user token
+
         bcrypt.genSalt(10, function (err, salt) {
           bcrypt.hash(password, salt, function (err, hash) {
             if (err) throw err;
@@ -52,6 +59,7 @@ exports.signup = (req, res, next) => {
                 res.status(200).json({
                   success: true,
                   result: response,
+                  accessToken,
                 });
               })
               .catch((err) => {
@@ -67,6 +75,7 @@ exports.signup = (req, res, next) => {
       res.status(500).json({
         errors: [{ error: "Something went wrong" }],
       });
+      console.log(err);
     });
 };
 
@@ -99,22 +108,28 @@ exports.login = (req, res, next) => {
                 .status(404)
                 .json({ errors: [{ password: "Incorrect Password" }] });
             }
-            let token = createJWT(user.email, user._id, 5000);
-            jwt.verify(token, process.env.TOKEN, (err, suces) => {
-              if (err) {
-                res.status(404).json({ error: err });
+            const accessToken = jwt.sign(
+              { userId: user._id, user },
+              process.env.TOKEN,
+              {
+                expiresIn: "1d",
               }
-              if (suces) {
-                return res.status(200).json({
-                  success: true,
-                  token: token,
-                  message: user,
+            );
+            User.findByIdAndUpdate(user._id, { accessToken })
+              .then((user) => {
+                res.status(200).json({
+                  data: { email:user.email , role:user.role },
+                  accessToken,
                 });
-              }
-            });
+              })
+              .catch((err) => {
+                next(err);
+                console.log(err);
+              });
           })
           .catch((err) => {
             res.status(502).json({ errors: err });
+            console.log(err);
           });
       }
     })
@@ -129,7 +144,7 @@ exports.logout = (req, res, next) => {
   jwt.sign(payload, "", { expiresIn: 1 }, (logout, err) => {
     if (logout) {
       console.log(logout);
-      res.send({ msg: "You have been Logged Out" });
+      res.send({ msg: "You have been Logged Out"+payload});
     } else {
       res.send({ msg: "Error" });
     }

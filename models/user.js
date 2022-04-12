@@ -10,11 +10,9 @@ let userSchema = new Schema(
     },
     email: {
       type: String,
-      unique: 1,
       trim: true,
       lowercase: true,
-      index:true,
-      sparse:true,
+      index:true, unique:true,sparse:true,
     },
     password: {
       type: String,
@@ -22,6 +20,11 @@ let userSchema = new Schema(
       minlength: 8,
     },
     role: {
+      type: String,
+      default: "customer",
+      enum: ["customer", "vendor", "admin"],
+    },
+    accessToken: {
       type: String,
     },
     status: {
@@ -44,7 +47,6 @@ let userSchema = new Schema(
     },
     otp: {
       type: String,
-      // required: true,
     },
     createdAt: { type: Date, default: Date.now(), index: { expiresIn: 300 } },
     source: { type: String },

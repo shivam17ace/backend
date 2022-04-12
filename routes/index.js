@@ -6,8 +6,9 @@ const { forgot, resetPassword } = require("../controllers/forgot");
 const { uploadimage } = require("../controllers/image");
 const { upload } = require("../controllers/image");
 const { create, update, findall, find } = require("../controllers/update");
+const rolehandler = require("../controllers/rolehandler");
 const { del, delall } = require("../controllers/status");
-const { otpsignup, otplogin, otplogout } = require("../controllers/otp");
+const { otpsignup,otplogin, otplogout } = require("../controllers/otp");
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
@@ -15,14 +16,40 @@ router.post("/forgot", forgot);
 router.post("/resetPassword/:userId/:token", resetPassword);
 router.post("/uploadimage/:id", upload, uploadimage);
 router.post("/otpsignup", otpsignup);
-router.post("/otplogin", otplogin);
+router.post("/otplogin",otplogin);
+// router.post("/otplogin",otplogin);
 router.post("/otplogout", otplogout);
 router.post("/createuser", create);
-router.put("/update/:id", update);
-router.put("/delete/:id", del);
-router.get("/users", findall);
+router.put(
+  "/update/:id",
+  rolehandler.allowIfLoggedin,
+  rolehandler.grantAccess("updateAny", "profile"),
+  update
+);
+router.put(
+  "/delete/:id",
+  rolehandler.allowIfLoggedin,
+  rolehandler.grantAccess("deleteAny", "profile"),
+  del
+);
+router.get(
+  "/users",
+  rolehandler.allowIfLoggedin,
+  rolehandler.grantAccess("readAny", "profile"),
+  findall
+);
 router.get("/user/:id", find);
-router.put("/deleteall", delall);
+router.put(
+  "/deleteall",
+  rolehandler.allowIfLoggedin,
+  rolehandler.grantAccess("deleteAny", "profile"),
+  delall
+);
+
+
+
+
+
 router.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })

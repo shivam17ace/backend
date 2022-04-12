@@ -9,8 +9,6 @@ const Route = require("./routes/index");
 const passport = require("passport");
 require("./controllers/googleauth");
 require("./controllers/facebokaut");
-
-
 /* middleware */
 app.use(bodyparser.json());
 app.use(express.json());

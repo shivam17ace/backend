@@ -1,4 +1,4 @@
-const User = require("../models/index");
+const User = require("../models/user");
 /* Delete Single User By Id */
 exports.del = (req, res, next) => {
   User.findByIdAndUpdate(

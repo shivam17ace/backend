@@ -1,9 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
-const User = require("../models/index");
+const User = require("../models/user");
 const Otp = require("../models/otp");
-const { createJWT } = require("../util/otptoken");
 const _ = require("lodash");
 
 /*  SIGNUP USING OTP     One issue */
@@ -31,11 +30,16 @@ module.exports.otpsignup = (req, res, next) => {
         /*  to send otp as a sms use local sms gateway {
 
         } */
+
         const user = new User({
           phone: phone,
           otp: OTP,
           source: "OTP",
         });
+        const accessToken = jwt.sign({ userId: user._id , user }, process.env.TOKEN, {
+          expiresIn: "1d",
+        });
+        user.accessToken = accessToken;
 
         bcrypt.genSalt(10, function (err, salt) {
           bcrypt.hash(user.otp, salt, function (err, hash) {
@@ -43,7 +47,7 @@ module.exports.otpsignup = (req, res, next) => {
             user.otp = hash;
             user.save();
             res.status(200).json({
-              message: "User Registered SucessFully   :" + OTP,
+              message: "OTP SEND SUCESSFULLY  :" + OTP,
             });
           });
         });
@@ -51,6 +55,7 @@ module.exports.otpsignup = (req, res, next) => {
     })
     .catch((err) => {
       res.status(500).json({ error: err });
+      console.log(err);
     });
 };
 

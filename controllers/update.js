@@ -1,10 +1,10 @@
-const User = require("../models/index");
+const User = require("../models/user");
 const emailRegxp =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
 /* Create User (ADMIN)  */
 exports.create = (req, res, next) => {
-  let { name, email, role, phone, password, confirm_password  } = req.body;
+  let { name, email, role, phone, password, confirm_password } = req.body;
   let errors = [];
   if (!name) {
     errors.push("name required");

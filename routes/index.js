@@ -8,7 +8,12 @@ const { upload } = require("../controllers/image");
 const { create, update, findall, find } = require("../controllers/update");
 const rolehandler = require("../controllers/rolehandler");
 const { del, delall } = require("../controllers/status");
-const { otpsignup,otplogin, otplogout } = require("../controllers/otp");
+const {
+  otpsignup,
+  verifyotp,
+  // otplogin,
+  otplogout,
+} = require("../controllers/otp");
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
@@ -16,8 +21,8 @@ router.post("/forgot", forgot);
 router.post("/resetPassword/:userId/:token", resetPassword);
 router.post("/uploadimage/:id", upload, uploadimage);
 router.post("/otpsignup", otpsignup);
-router.post("/otplogin",otplogin);
-// router.post("/otplogin",otplogin);
+router.post("/otpverify", verifyotp);
+// router.post("/otplogin", otplogin);
 router.post("/otplogout", otplogout);
 router.post("/createuser", create);
 router.put(
@@ -45,10 +50,6 @@ router.put(
   rolehandler.grantAccess("deleteAny", "profile"),
   delall
 );
-
-
-
-
 
 router.get(
   "/auth/google",

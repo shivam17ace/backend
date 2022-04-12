@@ -1,8 +1,6 @@
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
 const User = require("../models/user");
-const Otp = require("../models/otp");
 const _ = require("lodash");
 
 /*  SIGNUP USING OTP     One issue */
@@ -44,16 +42,9 @@ module.exports.otpsignup = (req, res, next) => {
           }
         );
         user.accessToken = accessToken;
-
-        bcrypt.genSalt(10, function (err, salt) {
-          bcrypt.hash(user.otp, salt, function (err, hash) {
-            if (err) throw err;
-            user.otp = hash;
-            user.save();
-            res.status(200).json({
-              message: "OTP SEND SUCESSFULLY  :" + OTP,
-            });
-          });
+        user.save();
+        res.status(200).json({
+          message: "OTP SEND SUCESSFULLY  :" + OTP,
         });
       }
     })
@@ -79,46 +70,41 @@ module.exports.otplogin = (req, res, next) => {
         return res.status(400).send("OTP Expired");
       }
       const rightOtpFind = otp[otp.length - 1];
-      bcrypt
-        .compare(req.body.otp, rightOtpFind.otp)
-        .then((match) => {
-          if (match) {
-            if (rightOtpFind.phone === req.body.phone) {
-              const user = new User(_.pick(req.body, ["phone"]));
-              const accessToken = jwt.sign(
-                { userId: user._id, user },
-                process.env.TOKEN,
-                {
-                  expiresIn: "1d",
-                }
-              );
-              User.findByIdAndUpdate(user._id, { accessToken })
-                .then((user) => {
-                  res.status(200).json({
-                    data: user,
-                    accessToken,
-                  });
-                })
-              user.save();
-              User.deleteMany({ phone: rightOtpFind.phone });
-              return res.status(200).send({
-                message: "USer Registration Sucessfull",
-                accessToken: accessToken,
-                data: user,
-              });
+      if (req.body.otp === rightOtpFind.otp) {
+        if (rightOtpFind.phone === req.body.phone) {
+          const user = new User(_.pick(req.body, ["phone"]));
+          const accessToken = jwt.sign(
+            { userId: user._id, user },
+            process.env.TOKEN,
+            {
+              expiresIn: "1d",
             }
-          } else {
-            res.status(400).send("Otp didnt matched");
-          }
-        })
-        .catch((error) => {
-          res.status(500).json({ error });
-          console.log(error);
-        });
+          );
+          User.findByIdAndUpdate(user._id, { accessToken }).then((user) => {
+            res
+              .status(200)
+              .json({
+                data: user,
+                accessToken,
+              })
+              .catch((err) => {
+                res.status(400).json({ error: err });
+              });
+          });
+          user.save();
+          // User.deleteMany({ phone: rightOtpFind.phone });
+          return res.status(200).send({
+            message: "USer Registration Sucessfull",
+            accessToken: accessToken,
+            data: user,
+          });
+        }
+      } else {
+        res.status(400).send("Otp didnt matched");
+      }
     })
-    .catch((error) => {
-      res.status(500).json({ error });
-      console.log(error);
+    .catch((err) => {
+      res.status(500).json({ error: err });
     });
 };
 

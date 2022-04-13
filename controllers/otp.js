@@ -11,7 +11,7 @@ module.exports.otpsignup = (req, res, next) => {
     errors.push("Phone No. Required");
   }
   if (errors.length > 0) {
-    return res.status(422).json({ errors: errors });
+     res.status(422).json({ errors: errors });
   }
   User.findOne({ phone: phone })
     .then((user) => {
@@ -26,7 +26,7 @@ module.exports.otpsignup = (req, res, next) => {
         console.log(OTP);
         User.findByIdAndUpdate(user._id, { otp: OTP }, { new: true })
           .then((data) => {
-            return res.status(200).json({
+             res.status(200).json({
               data:data
             })
           })
@@ -60,13 +60,13 @@ module.exports.otpsignup = (req, res, next) => {
         );
         user.accessToken = accessToken;
         user.save();
-       return res.status(200).json({
+        res.status(200).json({
           message: "OTP SEND SUCESSFULLY  :" + OTP,
         });
       }
     })
     .catch((err) => {
-     return res.status(500).json({ error: err });
+      res.status(500).json({ error: err });
       console.log(err);
     });
 };
@@ -79,12 +79,12 @@ module.exports.verifyotp = (req, res, next) => {
     errors.push("Phone No. Required");
   }
   if (errors.length > 0) {
-    return res.status(422).json({ errors: errors });
+     res.status(422).json({ errors: errors });
   }
   User.find({ phone: phone })
     .then((otp) => {
       if (otp.length === 0) {
-        return res.status(400).send("OTP Expired");
+         res.status(400).send("OTP Expired");
       }
       const rightOtpFind = otp[otp.length - 1];
       if (req.body.otp === rightOtpFind.otp) {
@@ -98,7 +98,7 @@ module.exports.verifyotp = (req, res, next) => {
             }
           );
           User.findByIdAndUpdate(user._id, { accessToken }).then((user) => {
-          return  res
+            res
               .status(200)
               .json({
                 data: user,
@@ -110,18 +110,18 @@ module.exports.verifyotp = (req, res, next) => {
           });
           user.save();
           // User.deleteMany({ phone: rightOtpFind.phone });
-          return res.status(200).send({
+           res.status(200).send({
             message: "USer Registration Sucessfull",
             accessToken: accessToken,
             data: user,
           });
         }
       } else {
-      return  res.status(400).send("Otp didnt matched");
+        res.status(400).send("Otp didnt matched");
       }
     })
     .catch((err) => {
-    return  res.status(500).json({ error: err });
+      res.status(500).json({ error: err });
     });
 };
 
@@ -133,7 +133,7 @@ module.exports.verifyotp = (req, res, next) => {
 //     errors.push("Phone No. Required");
 //   }
 //   if (errors.length > 0) {
-//     return res.status(422).json({ errors: errors });
+//      res.status(422).json({ errors: errors });
 //   }
 //   User.findOne({ phone: phone })
 //     .then((user) => {
@@ -152,7 +152,7 @@ module.exports.verifyotp = (req, res, next) => {
 //           // User.find({phone:phone})
 //           // .then((otp)=>{
 //           //   if (otp.length === 0) {
-//           //     return res.status(400).send("OTP Expired");
+//           //      res.status(400).send("OTP Expired");
 //           //   }
 //           //   const rightOtpFind = otp[otp.length - 1];
 //           //   if (req.body.otp === rightOtpFind.otp) {
@@ -178,7 +178,7 @@ module.exports.verifyotp = (req, res, next) => {
 //           //       });
 //           //       user.save();
 //           //       // User.deleteMany({ phone: rightOtpFind.phone });
-//           //       return res.status(200).send({
+//           //        res.status(200).send({
 //           //         message: "USer Registration Sucessfull",
 //           //         accessToken: accessToken,
 //           //         data: user,
@@ -217,9 +217,9 @@ exports.otplogout = (req, res, next) => {
   jwt.sign(payload, "", { expiresIn: 1 }, (logout, err) => {
     if (logout) {
       console.log(logout);
-    return  res.send({ msg: "You have been Logged Out" });
+      res.send({ msg: "You have been Logged Out" });
     } else {
-    return  res.send({ msg: "Error" });
+      res.send({ msg: "Error" });
     }
   });
 };

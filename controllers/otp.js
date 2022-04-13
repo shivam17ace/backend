@@ -11,7 +11,7 @@ module.exports.otpsignup = (req, res, next) => {
     errors.push("Phone No. Required");
   }
   if (errors.length > 0) {
-     res.status(422).json({ errors: errors });
+    res.status(422).json({ errors: errors });
   }
   User.findOne({ phone: phone })
     .then((user) => {
@@ -26,9 +26,9 @@ module.exports.otpsignup = (req, res, next) => {
         console.log(OTP);
         User.findByIdAndUpdate(user._id, { otp: OTP }, { new: true })
           .then((data) => {
-             res.status(200).json({
-              data:data
-            })
+            res.status(200).json({
+              data: data,
+            });
           })
           .catch((err) => {
             res.status(500).json({ error: err });
@@ -79,12 +79,12 @@ module.exports.verifyotp = (req, res, next) => {
     errors.push("Phone No. Required");
   }
   if (errors.length > 0) {
-     res.status(422).json({ errors: errors });
+    res.status(422).json({ errors: errors });
   }
   User.find({ phone: phone })
     .then((otp) => {
       if (otp.length === 0) {
-         res.status(400).send("OTP Expired");
+        res.status(400).send("OTP Expired");
       }
       const rightOtpFind = otp[otp.length - 1];
       if (req.body.otp === rightOtpFind.otp) {
@@ -97,7 +97,7 @@ module.exports.verifyotp = (req, res, next) => {
               expiresIn: "1d",
             }
           );
-          User.findByIdAndUpdate(user._id, { accessToken }).then((user) => {
+          User.findByIdAndUpdate(user._id, { accessToken } , {new:true}).then((user) => {
             res
               .status(200)
               .json({
@@ -110,7 +110,7 @@ module.exports.verifyotp = (req, res, next) => {
           });
           user.save();
           // User.deleteMany({ phone: rightOtpFind.phone });
-           res.status(200).send({
+          res.status(200).send({
             message: "USer Registration Sucessfull",
             accessToken: accessToken,
             data: user,

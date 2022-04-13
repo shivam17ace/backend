@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const emailRegxp =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-
+  const jwt = require("jsonwebtoken")
 /* Create User (ADMIN)  */
 exports.create = (req, res, next) => {
   let { name, email, role, phone, password, confirm_password } = req.body;
@@ -102,6 +102,7 @@ exports.update = (req, res, next) => {
       email: email,
       role: req.body.role,
       phone: req.body.phone,
+      status:req.body.status,
     },
     { new: true },
     (err, doc) => {
@@ -117,7 +118,7 @@ exports.update = (req, res, next) => {
 /*  GET ALL USER DATA */
 exports.findall = (req, res, next) => {
   /* Pagenation ,filtering, Sorting  */
-  let { name, email, role, status, sortBy } = req.query;
+  let { name, email, role, status, sortBy, source } = req.query;
   let page = parseInt(req.query.page);
   let limit = parseInt(req.query.limit);
   let skip = parseInt(req.query.skip);
@@ -132,6 +133,9 @@ exports.findall = (req, res, next) => {
   }
   if (role != null) {
     filter.role = role;
+  }
+  if (source != null) {
+    filter.source = source;
   }
   if (status != null) {
     filter.status = status;

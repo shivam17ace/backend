@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const emailRegxp =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 const jwt = require("jsonwebtoken");
-const { createJWT } = require("../../util/token");
 
 exports.signup = (req, res, next) => {
   let { name, email, password, confirm_password } = req.body;

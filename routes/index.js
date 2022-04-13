@@ -5,7 +5,7 @@ const { signup, login, logout } = require("../controllers/Authentication/user");
 const { forgot, resetPassword } = require("../controllers/forgot");
 const { uploadimage } = require("../controllers/image");
 const { upload } = require("../controllers/image");
-const { create, update, findall, find } = require("../controllers/update");
+const { create, update, findall, find  } = require("../controllers/update");
 const rolehandler = require("../controllers/rolehandler");
 const { del, delall } = require("../controllers/status");
 const {
@@ -22,31 +22,26 @@ router.post("/resetPassword/:userId/:token", resetPassword);
 router.post("/uploadimage/:id", upload, uploadimage);
 router.post("/otpsignup", otpsignup);
 router.post("/otpverify", verifyotp);
-// router.post("/otplogin", otplogin);
 router.post("/otplogout", otplogout);
-router.post("/createuser", create);
+router.post("/createuser",rolehandler.grantAccess("createAny", "profile"), create);
 router.put(
   "/update/:id",
-  rolehandler.allowIfLoggedin,
   rolehandler.grantAccess("updateAny", "profile"),
   update
 );
 router.put(
   "/delete/:id",
-  rolehandler.allowIfLoggedin,
   rolehandler.grantAccess("deleteAny", "profile"),
   del
 );
 router.get(
   "/users",
-  rolehandler.allowIfLoggedin,
   rolehandler.grantAccess("readAny", "profile"),
   findall
 );
 router.get("/user/:id", find);
 router.put(
   "/deleteall",
-  rolehandler.allowIfLoggedin,
   rolehandler.grantAccess("deleteAny", "profile"),
   delall
 );

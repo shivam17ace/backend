@@ -42,9 +42,13 @@ exports.signup = (req, res, next) => {
           email: email,
           password: password,
         });
-        const accessToken = jwt.sign({ userId: users._id, users }, process.env.TOKEN, {
-          expiresIn: "1d",
-        });
+        const accessToken = jwt.sign(
+          { userId: users._id, users },
+          process.env.TOKEN,
+          {
+            expiresIn: "1d",
+          }
+        );
         users.accessToken = accessToken;
         // save user token
 
@@ -117,7 +121,7 @@ exports.login = (req, res, next) => {
             User.findByIdAndUpdate(user._id, { accessToken })
               .then((user) => {
                 res.status(200).json({
-                  data: { email:user.email , role:user.role },
+                  data: { email: user.email, role: user.role },
                   accessToken,
                 });
               })
@@ -143,7 +147,7 @@ exports.logout = (req, res, next) => {
   jwt.sign(payload, "", { expiresIn: 1 }, (logout, err) => {
     if (logout) {
       console.log(logout);
-      res.send({ msg: "You have been Logged Out"+payload});
+      res.send({ msg: "You have been Logged Out" + payload });
     } else {
       res.send({ msg: "Error" });
     }

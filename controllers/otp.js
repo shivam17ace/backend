@@ -89,20 +89,20 @@ module.exports.verifyotp = (req, res, next) => {
       const rightOtpFind = otp[otp.length - 1];
       if (req.body.otp === rightOtpFind.otp) {
         if (rightOtpFind.phone === req.body.phone) {
-          res.status(200).send(otp);
+          // res.status(200).send(otp);
           // const user = new User(_.pick(req.body, ["phone"]));
           // User.findById(user._id).then((dta) => res.json({ message: dta }));
           // console.log(user._id);
           // user.save();
           const accessToken = jwt.sign(
-            { userId: otp._id, otp },
+            { userId: otp[0]._id, otp },
             process.env.TOKEN,
             {
               expiresIn: "1d",
             }
           );
           User.findByIdAndUpdate(
-            otp._id,
+            otp[0]._id,
             { accessToken: accessToken },
             { new: true }
           ).then((user) => {
@@ -125,6 +125,7 @@ module.exports.verifyotp = (req, res, next) => {
     })
     .catch((err) => {
       res.status(500).json({ error: err });
+      console.log(err);
     });
 };
 

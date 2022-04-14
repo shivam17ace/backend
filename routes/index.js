@@ -26,12 +26,12 @@ router.post("/otplogout", otplogout);
 router.post("/createuser",rolehandler.grantAccess("createAny", "profile"), create);
 router.put(
   "/update/:id",
-  rolehandler.grantAccess("updateAny", "profile"),
+  rolehandler.grantAccess("updateOwn", "profile"),
   update
 );
 router.put(
   "/delete/:id",
-  rolehandler.grantAccess("deleteAny", "profile"),
+  rolehandler.grantAccess("deleteOwn", "profile"),
   del
 );
 router.get(

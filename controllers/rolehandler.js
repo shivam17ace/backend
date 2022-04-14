@@ -16,14 +16,14 @@ exports.grantAccess = function (action, resource) {
       let user;
       User.findById(userId).then((data) => {
         user = data;
-        console.log(user)
+        // console.log(user)
         if (!user)
           return res.status(401).json({
             error: "You need to be logged in to access this route",
           });
         else {
           req.user = data;
-          console.log("==>", user);
+          // console.log("==>", user);
           console.log(user.role);
           const permission = roles.can(user.role)[action](resource);
           if (!permission.granted) {

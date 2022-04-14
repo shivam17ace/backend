@@ -89,31 +89,34 @@ module.exports.verifyotp = (req, res, next) => {
       const rightOtpFind = otp[otp.length - 1];
       if (req.body.otp === rightOtpFind.otp) {
         if (rightOtpFind.phone === req.body.phone) {
-          const user = new User(_.pick(req.body, ["phone"]));
+          res.status(200).send(otp);
+          // const user = new User(_.pick(req.body, ["phone"]));
+          // User.findById(user._id).then((dta) => res.json({ message: dta }));
+          // console.log(user._id);
+          // user.save();
           const accessToken = jwt.sign(
-            { userId: user._id, user },
+            { userId: otp._id, otp },
             process.env.TOKEN,
             {
               expiresIn: "1d",
             }
           );
-          User.findByIdAndUpdate(user._id, { accessToken } , {new:true}).then((user) => {
-            res
-              .status(200)
-              .json({
-                data: user,
-                accessToken,
-              })
-              .catch((err) => {
-                res.status(400).json({ error: err });
-              });
+          User.findByIdAndUpdate(
+            otp._id,
+            { accessToken: accessToken },
+            { new: true }
+          ).then((user) => {
+            res.status(200).json({
+              data: user,
+              accessToken,
+            });
           });
-          user.save();
-          // User.deleteMany({ phone: rightOtpFind.phone });
-          res.status(200).send({
+
+          // // User.deleteMany({ phone: rightOtpFind.phone });
+          res.status(200).json({
             message: "USer Registration Sucessfull",
             accessToken: accessToken,
-            data: user,
+            data: otp,
           });
         }
       } else {

@@ -26,6 +26,10 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+const path = require('path')
+app.use('/static', express.static(path.join(__dirname, 'public')))
+
 /* mongodb connection */
 mongoose
   .connect(process.env.DATABASE)

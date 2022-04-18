@@ -78,5 +78,5 @@ router.get(
   })
 );
 router.post("/upload-csv",uploadCsv,uploadcsv);
-router.get("/downloadcsv",downloadcsv)
+router.get("/downloadcsv",downloadcsv);
 module.exports = router;

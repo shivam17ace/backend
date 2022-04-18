@@ -16,6 +16,7 @@ const {
   otplogout,
 } = require("../controllers/otp");
 const {uploadcsv} = require("../controllers/uploadcsv");
+const {downloadcsv} = require("../controllers/downloadcsv");
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
@@ -77,4 +78,5 @@ router.get(
   })
 );
 router.post("/upload-csv",uploadCsv,uploadcsv);
+router.get("/downloadcsv",downloadcsv)
 module.exports = router;

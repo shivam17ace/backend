@@ -42,14 +42,14 @@ exports.signup = (req, res, next) => {
           email: email,
           password: password,
         });
-        const accessToken = jwt.sign(
+        const token = jwt.sign(
           { userId: users._id, users },
           process.env.TOKEN,
           {
             expiresIn: "1d",
           }
         );
-        users.accessToken = accessToken;
+        users.token = token;
         // save user token
 
         bcrypt.genSalt(10, function (err, salt) {
@@ -62,7 +62,7 @@ exports.signup = (req, res, next) => {
                 res.status(200).json({
                   success: true,
                   result: response,
-                  accessToken,
+                  token,
                 });
               })
               .catch((err) => {
@@ -111,18 +111,18 @@ exports.login = (req, res, next) => {
                 .status(404)
                 .json({ errors: [{ password: "Incorrect Password" }] });
             }
-            const accessToken = jwt.sign(
+            const token = jwt.sign(
               { userId: user._id, user },
               process.env.TOKEN,
               {
                 expiresIn: "1d",
               }
             );
-            User.findByIdAndUpdate(user._id, { accessToken })
+            User.findByIdAndUpdate(user._id, { token })
               .then((user) => {
                 res.status(200).json({
                   data: { email: user.email, role: user.role },
-                  accessToken,
+                  token,
                 });
               })
               .catch((err) => {

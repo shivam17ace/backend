@@ -51,14 +51,14 @@ module.exports.otpsignup = (req, res, next) => {
           otp: OTP,
           source: "OTP",
         });
-        const accessToken = jwt.sign(
+        const token = jwt.sign(
           { userId: user._id, user },
           process.env.TOKEN,
           {
             expiresIn: "1d",
           }
         );
-        user.accessToken = accessToken;
+        user.token = token;
         user.save();
         res.status(200).json({
           message: "OTP SEND SUCESSFULLY  :" + OTP,
@@ -94,7 +94,7 @@ module.exports.verifyotp = (req, res, next) => {
           // User.findById(user._id).then((dta) => res.json({ message: dta }));
           // console.log(user._id);
           // user.save();
-          const accessToken = jwt.sign(
+          const token = jwt.sign(
             { userId: otp[0]._id, otp },
             process.env.TOKEN,
             {
@@ -103,19 +103,19 @@ module.exports.verifyotp = (req, res, next) => {
           );
           User.findByIdAndUpdate(
             otp[0]._id,
-            { accessToken: accessToken },
+            { token: token },
             { new: true }
           ).then((user) => {
             res.status(200).json({
               data: user,
-              accessToken,
+              token,
             });
           });
 
           // // User.deleteMany({ phone: rightOtpFind.phone });
           res.status(200).json({
             message: "USer Registration Sucessfull",
-            accessToken: accessToken,
+            token: token,
             data: otp,
           });
         }
@@ -162,19 +162,19 @@ module.exports.verifyotp = (req, res, next) => {
 //           //   if (req.body.otp === rightOtpFind.otp) {
 //           //     if (rightOtpFind.phone === req.body.phone) {
 //           //       const user = new User(_.pick(req.body, ["phone"]));
-//           //       const accessToken = jwt.sign(
+//           //       const token = jwt.sign(
 //           //         { userId: user._id, user },
 //           //         process.env.TOKEN,
 //           //         {
 //           //           expiresIn: "1d",
 //           //         }
 //           //       );
-//           //       User.findByIdAndUpdate(user._id, { accessToken }).then((user) => {
+//           //       User.findByIdAndUpdate(user._id, { token }).then((user) => {
 //           //         res
 //           //           .status(200)
 //           //           .json({
 //           //             data: user,
-//           //             accessToken,
+//           //             token,
 //           //           })
 //           //           .catch((err) => {
 //           //             res.status(400).json({ error: err });
@@ -184,7 +184,7 @@ module.exports.verifyotp = (req, res, next) => {
 //           //       // User.deleteMany({ phone: rightOtpFind.phone });
 //           //        res.status(200).send({
 //           //         message: "USer Registration Sucessfull",
-//           //         accessToken: accessToken,
+//           //         token: token,
 //           //         data: user,
 //           //       });
 //           //     }

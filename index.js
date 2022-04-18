@@ -26,21 +26,6 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-// app.use((req, res, next) => {
-//   if (req.headers["x-access-token"]) {
-//     const accessToken = req.headers["x-access-token"];
-//     const { userId, exp } = jwt.verify(accessToken, process.env.TOKEN);
-//     // If token has expired
-//     if (exp < Date.now().valueOf() / 1000) {
-//       return res.status(401).json({
-//         error: "JWT token has expired, please login to obtain a new one",
-//       });
-//     }
-//     res.locals.loggedInUser = User.findById(userId)
-//   } else {
-//     next();
-//   }
-// });
 /* mongodb connection */
 mongoose
   .connect(process.env.DATABASE)

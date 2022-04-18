@@ -11,35 +11,23 @@ passport.use(
       passReqToCallback: true,
     },
     function (request, accessToken, refreshToken, profile, done) {
-      const newuser = new User({
+      const user = new User({
         id: profile.id,
         name: profile.displayName,
         image: profile.photos[0].value,
         email: profile.emails[0].value,
         source: "google",
       });
-      if(newuser){
-        const accessToken = jwt.sign(
-          { userId: newuser._id, newuser },
-          process.env.TOKEN,
-          {
-            expiresIn: "1d",
-          }
-        );
-        User.findOneAndUpdate({email:newuser.email},{accessToken:accessToken})
-        .then((data)=>{
-          console.log(data)
-        })
-        .catch((err)=>{
-          console.log(err)
-        })
-      }
-      User.findOne({ email: newuser.email })
+      const token = jwt.sign({ userId: user._id, user }, process.env.TOKEN, {
+        expiresIn: "1d",
+      });
+      user.token = token;
+      User.findOne({ email: user.email })
         .then((data) => {
           if (data) {
             done(null, data);
           } else {
-            data = User.create(newuser);
+            data = User.create(user);
             done(null, data);
           }
         })
@@ -49,13 +37,12 @@ passport.use(
     }
   )
 );
-passport.serializeUser(function (newuser, done) {
-  // console.log(newuser);
-  done(null, newuser.id);
-});
+// passport.serializeUser(function (user, done) {
+//   done(null, user.id);
+// });
 
-passport.deserializeUser(function (id, done) {
-  User.findById(id, function (err, user) {
-    done(err, user);
-  });
-});
+// passport.deserializeUser(function (id, done) {
+//   User.findById(id, function (err, user) {
+//     done(err, user);
+//   });
+// });

@@ -43,13 +43,13 @@ passport.use(
     }
   )
 );
-passport.serializeUser(function (newuser, done) {
-  console.log(newuser);
-  done(null, newuser.id);
-});
+// passport.serializeUser(function (newuser, done) {
+//   console.log(newuser);
+//   done(null, newuser.id);
+// });
 
-passport.deserializeUser(function (id, done) {
-  User.findById(id, function (err, user) {
-    done(err, user);
-  });
-});
+// passport.deserializeUser(function (id, done) {
+//   User.findById(id, function (err, user) {
+//     done(err, user);
+//   });
+// });

@@ -54,7 +54,9 @@ router.get(
 );
 router.get(
   "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
+  passport.authenticate("google", { failureRedirect: "/" ,
+  session: false
+}),
   (req, res, next) => {
     res.redirect("/");
   }
@@ -71,6 +73,7 @@ router.get(
   "/auth/facebook/callback",
   passport.authenticate("facebook", {
     failureRedirect: "/",
+    session: false
   })
 );
 router.post("/upload-csv",uploadCsv,uploadcsv);

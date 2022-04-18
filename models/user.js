@@ -24,7 +24,7 @@ let userSchema = new Schema(
       default: "customer",
       enum: ["customer", "vendor", "admin"],
     },
-    accessToken: {
+    token: {
       type: String,
     },
     status: {

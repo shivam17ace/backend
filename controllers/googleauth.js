@@ -11,8 +11,6 @@ passport.use(
       passReqToCallback: true,
     },
     function (request, accessToken, refreshToken, profile, done) {
-      console.log(accessToken);
-      // console.log(profile);
       const newuser = new User({
         id: profile.id,
         name: profile.displayName,
@@ -20,6 +18,22 @@ passport.use(
         email: profile.emails[0].value,
         source: "google",
       });
+      if(newuser){
+        const accessToken = jwt.sign(
+          { userId: newuser._id, newuser },
+          process.env.TOKEN,
+          {
+            expiresIn: "1d",
+          }
+        );
+        User.findOneAndUpdate({email:newuser.email},{accessToken:accessToken})
+        .then((data)=>{
+          console.log(data)
+        })
+        .catch((err)=>{
+          console.log(err)
+        })
+      }
       User.findOne({ email: newuser.email })
         .then((data) => {
           if (data) {
@@ -36,7 +50,7 @@ passport.use(
   )
 );
 passport.serializeUser(function (newuser, done) {
-  console.log(newuser);
+  // console.log(newuser);
   done(null, newuser.id);
 });
 

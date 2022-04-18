@@ -1,6 +1,7 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2");
 const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 passport.use(
   new GoogleStrategy(
     {
@@ -9,8 +10,9 @@ passport.use(
       callbackURL: process.env.GOOGLE_CALLBACK_URL,
       passReqToCallback: true,
     },
-    function (request, acessToken, refreshToken, profile, done) {
-      console.log(profile);
+    function (request, accessToken, refreshToken, profile, done) {
+      console.log(accessToken);
+      // console.log(profile);
       const newuser = new User({
         id: profile.id,
         name: profile.displayName,

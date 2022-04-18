@@ -5,6 +5,7 @@ const { signup, login, logout } = require("../controllers/Authentication/user");
 const { forgot, resetPassword } = require("../controllers/forgot");
 const { uploadimage } = require("../controllers/image");
 const { upload } = require("../controllers/image");
+const { uploadCsv } = require("../controllers/uploadcsv");
 const { create, update, findall, find  } = require("../controllers/update");
 const rolehandler = require("../controllers/rolehandler");
 const { del, delall } = require("../controllers/status");
@@ -14,6 +15,7 @@ const {
   // otplogin,
   otplogout,
 } = require("../controllers/otp");
+const {uploadcsv} = require("../controllers/uploadcsv");
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
@@ -71,4 +73,5 @@ router.get(
     failureRedirect: "/",
   })
 );
+router.post("/upload-csv",uploadCsv,uploadcsv);
 module.exports = router;

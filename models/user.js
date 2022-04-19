@@ -42,6 +42,9 @@ let userSchema = new Schema(
       trim: true,
       // unique:true,
     },
+  date:{
+    type:Date,
+  },
     image: {
       type: String,
     },

@@ -25,6 +25,11 @@ passport.use(
       User.findOne({ email: user.email })
         .then((data) => {
           if (data) {
+            User.updateOne({}, { token: token, source: "google" }).then(
+              (info) => {
+                console.log(info);
+              }
+            );
             done(null, data);
           } else {
             data = User.create(user);

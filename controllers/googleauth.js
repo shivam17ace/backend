@@ -26,9 +26,7 @@ passport.use(
         .then((data) => {
           if (data) {
             User.updateOne({}, { token: token, source: "google" }).then(
-              (info) => {
-                console.log(info);
-              }
+              (info) => {}
             );
             done(null, data);
           } else {

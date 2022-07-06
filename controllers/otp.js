@@ -6,7 +6,7 @@ const _ = require("lodash");
 /*  SIGNUP USING OTP     One issue */
 module.exports.otpsignup = (req, res, next) => {
   let { phone } = req.body;
-  let errors = {};
+  let errors = [];
   if (!phone) {
     errors.push("Phone No. Required");
   }

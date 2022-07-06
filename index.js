@@ -24,8 +24,8 @@ app.use(
     secret: "bla bla bla",
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 const path = require('path')
 app.use('/static', express.static(path.join(__dirname, 'public')))

@@ -43,21 +43,33 @@ exports.resetPassword = (req, res, next) => {
     if (!user) {
       res.status(400).send("Invalid Link OR Link Expired");
     } else {
-      User.findOne({
-        resetPasswordToken: req.params.resetPasswordToken,
-        resetPasswordExpires: { $gt: Date.now() },
-      }).then((user) => {
-        user.password = req.body.password;
-        bcrypt.genSalt(10, function (err, salt) {
-          bcrypt.hash(user.password, salt, function (err, hash) {
-            if (err) throw err;
-            user.password = hash;
-            user.save();
-            console.log(user.password);
-            res.status(201).send(user);
+      // User.findById({
+      //   // resetPasswordToken: req.params.resetPasswordToken,
+      //   // resetPasswordExpires: { $gt: Date.now() },
+      // })
+      User.findById(req.params.userId)
+      .then((user) => {
+        console.log(user)
+        if(user.resetPasswordExpires >  Date.now()){
+          user.password = req.body.password;
+          bcrypt.genSalt(10, function (err, salt) {
+            bcrypt.hash(user.password, salt, function (err, hash) {
+              if (err) throw err;
+              user.password = hash;
+              user.save();
+              console.log(user.password);
+              res.status(201).send(user);
+            });
           });
-        });
-      });
+        }
+        else{
+          res.status(401).send("Reset Password Token Expired")
+        }
+      })
+      .catch((err)=>{
+        res.status(502).json({ errors: err });
+            console.log(err);
+      })
     }
   });
 };

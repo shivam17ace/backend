@@ -3,8 +3,11 @@ const mongoSanitize = require("express-mongo-sanitize");
 const app = express();
 const session = require("express-session");
 const mongoose = require("mongoose");
-const bodyparser = require("body-parser");
+var bodyparser = require("body-parser");
 const jwt = require("jsonwebtoken");
+
+var cors = require('cors')
+
 require("dotenv").config();
 const Route = require("./routes/index");
 const passport = require("passport");
@@ -15,6 +18,7 @@ require("./controllers/rolehandler");
 app.use(bodyparser.json());
 app.use(express.json());
 app.use(mongoSanitize());
+app.use(cors())
 app.use("/", Route);
 app.use("/uploads", express.static("./uploads"));
 app.use(

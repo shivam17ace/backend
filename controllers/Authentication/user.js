@@ -121,7 +121,7 @@ exports.login = (req, res, next) => {
             User.findByIdAndUpdate(user._id, { token })
               .then((user) => {
                 res.status(200).json({
-                  data: { email: user.email, role: user.role },
+                  data: { id: user._id, email: user.email, role: user.role },
                   token,
                 });
               })
